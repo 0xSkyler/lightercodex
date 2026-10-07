@@ -6,10 +6,10 @@ __pycache__/
 .mypy_cache/
 .env
 .env.*
+*.env
 !.env.example
 data/
 logs/
 dist/
 build/
 *.egg-info/
-

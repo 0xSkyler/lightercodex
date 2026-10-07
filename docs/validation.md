@@ -8,14 +8,20 @@ Validated in the current cloud machine on 2026-10-07 with Python 3.12.14, uv 0.1
 | Hashed `requirements.lock` installation in a clean virtual environment | Passed with TLS/checksum verification retained |
 | `python -m pip install --no-deps --no-build-isolation .` in the clean environment | Passed; installed console entry point works |
 | Native SDK signer loading | Passed on Linux x86_64 |
-| `pytest -q` | **61 passed**, no failures/skips/expected failures; two upstream SDK WebSocket deprecation warnings |
+| `pytest -q` | **88 passed**, no failures/skips/expected failures; two upstream SDK WebSocket deprecation warnings |
 | `ruff check src tests` and format check | Passed |
-| `mypy src` | Passed for all 14 source modules |
+| `mypy src` | Passed for all 15 source modules |
 | `lighter-scalper doctor` | Passed against current public mainnet metadata, actual book snapshot/delta, BBO, and individual-trade streams |
 | CLI help and local status | Passed from development and clean installed environments |
 | Missing live confirmations/credentials | `run` and `account-info` fail closed with exit code 78 |
-| Deployment shell syntax | `bash -n deploy/install.sh deploy/update.sh` passed |
+| Deployment shell syntax | `bash -n deploy/install.sh deploy/install-dashboard.sh deploy/update.sh` passed |
 | systemd unit structure | `systemd-analyze verify` passed with ExecStart mapped to the actual cloud CLI path in a temporary unit |
+| Dashboard boundary and process controls | Passed: loopback/Host/origin/session enforcement, protected atomic settings, key redaction, expiry/fee checks, external-owner exclusion, concurrent actions, and graceful fake-process stop/flatten |
+| Chromium browser acceptance | Passed: all four pages, credential save/verification, secret never returned, strategy save/validation, typed confirmations, fake start/stop/flatten, logs, and 390px mobile layout |
+| Dashboard public BTC feed | Real mainnet prices displayed during visual inspection; no credentials or exchange transactions used |
+| Packaged web assets | Installed Python wheel includes HTML/CSS/JS; installed dashboard tested independently of the editable checkout |
+
+Browser acceptance runs `node tests/browser_dashboard.cjs` with Playwright and Chromium available. It launches its own temporary server with `tests/dashboard_browser_fixture.py`. This fixture overrides every account/process adapter, disables exchange market connections, and launches only local Python print/sleep processes. It cannot place exchange orders. `DASHBOARD_PYTHON` can point to a clean installed interpreter, and `CHROMIUM_PATH` can select the local browser binary. Node/Playwright are only development test tools; the deployed dashboard has no Node dependency or frontend build step.
 
 Tests exercise exact long/short P&L, full-size depth VWAP, fee/buffer subtraction, strict profit thresholds, precision caps, absolute book updates and nonce continuity, stale data, symmetric signals, duplicate prevention, partial fills/exits, durable prepared/signed intents, unknown-order handling, startup exposure recovery, weighted/shared rate reserves, BBO liquidity, private-vs-REST transaction ordering, WebSocket subscriptions/auth request routing, and a full entry-to-fill-to-green-exit-to-confirmed-flat lifecycle using deterministic exchange test fixtures. No test sends exchange orders.
 
@@ -26,7 +32,7 @@ Outstanding checks require outside prerequisites:
 * The actual account index, registered API key index, and raw local API signing key are absent. Authenticated account inspection, private stream integration, native key registration matching, and leverage confirmation are therefore unrun against the user's account.
 * Funded order execution and exchange latency have not been tested. The uploaded specification requires an explicit production-service start and prohibits real orders in software tests.
 * The full root-level installer, chrony/systemd daemon operation, and 24/7 service behavior require the target Ubuntu VPS. Only the dependency/package installation path, shell syntax, and unit structure were validated here.
-* Files are local to the empty repository checkout and have not been committed or pushed to GitHub.
+* GitHub publication does not install or start services on the user's VPS. No remote VPS credentials or RustDesk desktop connection were available in this cloud environment.
 * Cloud configuration saving is separate from publishing a snapshot. Fresh-task restoration was not tested.
 
 Reusable install and startup instructions, Lighter network destinations, and missing runtime variable requirements are saved in the cloud environment draft for review. The development workflow is installed and validated; production readiness remains pending the account/VPS checks above.

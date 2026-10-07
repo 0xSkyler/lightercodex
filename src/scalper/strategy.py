@@ -766,6 +766,9 @@ class Bot:
             "market": "BTC perpetual",
             "heartbeat_utc_ns": time.time_ns(),
             "account_index": self.config.account_index,
+            "available_balance": str(self.snapshot.account["available_balance"])
+            if self.snapshot
+            else None,
             "position": str(self.position.quantity),
             "average_entry": str(self.position.entry),
             "leverage": self.config.leverage,

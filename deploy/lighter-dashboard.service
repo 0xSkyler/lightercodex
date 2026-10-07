@@ -1,0 +1,38 @@
+[Unit]
+Description=Lighter local trading dashboard for RustDesk desktops
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=lighter-scalper
+Group=lighter-scalper
+WorkingDirectory=/opt/lighter-scalper
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/lighter-scalper/.venv/bin/lighter-scalper --env /var/lib/lighter-scalper/dashboard.env ui --port 8787 --data-dir /var/lib/lighter-scalper --log-dir /var/log/lighter-scalper
+Restart=on-failure
+RestartSec=15
+RestartPreventExitStatus=78
+TimeoutStopSec=240
+KillSignal=SIGTERM
+KillMode=mixed
+SendSIGKILL=no
+StateDirectory=lighter-scalper
+StateDirectoryMode=0700
+LogsDirectory=lighter-scalper
+LogsDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/lighter-scalper /var/log/lighter-scalper
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+LimitNOFILE=4096
+MemoryMax=768M
+
+[Install]
+WantedBy=multi-user.target

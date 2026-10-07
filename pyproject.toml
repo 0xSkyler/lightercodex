@@ -19,6 +19,9 @@ build = ["setuptools==80.9.0", "wheel==0.45.1"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+scalper = ["web/*.html", "web/*.css", "web/*.js"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]

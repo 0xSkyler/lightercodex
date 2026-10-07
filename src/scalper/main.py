@@ -242,8 +242,17 @@ def main() -> None:
     status = subparsers.add_parser("status")
     status.add_argument("--watch", action="store_true")
     status.add_argument("--data-dir", default=None)
+    ui = subparsers.add_parser("ui", help="Local browser dashboard for RustDesk desktops")
+    ui.add_argument("--port", type=int, default=8787)
+    ui.add_argument("--data-dir", default=None)
+    ui.add_argument("--log-dir", default=None)
     args = parser.parse_args()
     try:
+        if args.command == "ui":
+            from scalper.dashboard import serve
+
+            serve(args.env, args.port, args.data_dir, args.log_dir)
+            return
         if args.command == "doctor":
             asyncio.run(doctor())
             return

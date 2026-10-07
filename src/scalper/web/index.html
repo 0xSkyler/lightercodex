@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Lighter · Trading workspace</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2379ecc2'/%3E%3Cpath d='M18 5 8 18h8l-2 9 11-14h-8z' fill='%23101715'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/assets/dashboard.css" />
+    <script src="/assets/dashboard.js" defer></script>
+  </head>
+  <body>
+    <svg class="sprite" aria-hidden="true">
+      <defs>
+        <symbol id="i-grid" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" />
+        </symbol>
+        <symbol id="i-key" viewBox="0 0 24 24">
+          <circle cx="8" cy="8" r="5" />
+          <path d="m11.5 11.5 9 9M16 16l3-3m0 6 3-3" />
+        </symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24">
+          <path d="M5 3v6m0 4v8M12 3v11m0 4v3M19 3v2m0 4v12" />
+          <path d="M2 9h6m1 9h6m1-13h6" />
+        </symbol>
+        <symbol id="i-history" viewBox="0 0 24 24">
+          <path d="M3 11a9 9 0 1 1 2 7M3 4v7h7m2-5v6l4 2" />
+        </symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M5 12h14m-5-5 5 5-5 5" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L19 6" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path d="M12 3 3 7v6c0 5 9 9 9 9s9-4 9-9V7z" />
+          <path d="m8 12 3 3 5-6" />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 24 24">
+          <path d="m8 5 11 7-11 7z" />
+        </symbol>
+        <symbol id="i-stop" viewBox="0 0 24 24">
+          <rect x="5" y="5" width="14" height="14" rx="2" />
+        </symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24">
+          <path
+            d="M20 7a9 9 0 0 0-15-2L2 9m0-6v6h6m-4 8a9 9 0 0 0 15 2l3-4m0 6v-6h-6"
+          />
+        </symbol>
+        <symbol id="i-monitor" viewBox="0 0 24 24">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M12 17v4m-5 0h10" />
+        </symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24">
+          <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12" />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24">
+          <path d="m12 3 10 18H2zM12 9v5m0 3v1" />
+        </symbol>
+        <symbol id="i-wallet" viewBox="0 0 24 24">
+          <path d="M20 7H5a3 3 0 0 1 0-6h13v6M3 4v15a2 2 0 0 0 2 2h15V7" />
+          <path d="M20 11h-6v6h6m-3-3h.01" />
+        </symbol>
+      </defs>
+    </svg>
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="Lighter overview"
+        ><span class="brand-mark">ϟ</span>lighter<span class="brand-dot"
+          >.</span
+        ></a
+      >
+      <div class="workspace-label">TRADING WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <a href="#overview" data-nav="overview" class="nav-link active"
+          ><svg><use href="#i-grid" /></svg>Overview<span class="nav-dot"></span
+        ></a>
+        <a href="#credentials" data-nav="credentials" class="nav-link"
+          ><svg><use href="#i-key" /></svg>Connection</a
+        >
+        <a href="#strategy" data-nav="strategy" class="nav-link"
+          ><svg><use href="#i-sliders" /></svg>Strategy</a
+        >
+        <a href="#activity" data-nav="activity" class="nav-link"
+          ><svg><use href="#i-history" /></svg>Activity</a
+        >
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="desktop-card">
+          <svg><use href="#i-monitor" /></svg
+          ><strong>Your desktop, your control</strong>
+          <p>Open this workspace on the desktop you access through RustDesk.</p>
+          <span class="local-address">127.0.0.1:8787</span>
+        </div>
+        <div class="sidebar-footer">
+          <span class="status-dot"></span>Local connection<span class="version"
+            >v0.2</span
+          >
+        </div>
+      </div>
+    </aside>
+    <div class="app">
+      <header class="topbar">
+        <div class="breadcrumb">
+          Workspace <span>/</span> <strong id="page-name">Overview</strong>
+        </div>
+        <div class="topbar-right">
+          <span class="network-badge"
+            ><span class="status-dot"></span>Lighter mainnet</span
+          ><time id="clock"></time>
+        </div>
+      </header>
+      <main>
+        <div id="connection-alert" class="alert error" hidden>
+          Dashboard disconnected. Controls are unavailable until the local
+          connection returns.
+        </div>
+        <section id="view-overview" class="view">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">BTC PERPETUAL · LIVE WORKSPACE</div>
+              <h1>A clear view of every move.</h1>
+              <p>
+                Connect your account. Define your strategy. Stay in control.
+              </p>
+            </div>
+            <div class="heading-actions">
+              <button class="button secondary" id="stop-bot" disabled>
+                <svg><use href="#i-stop" /></svg>Stop bot</button
+              ><button class="button primary" id="start-bot">
+                <svg><use href="#i-play" /></svg>Start trading
+              </button>
+            </div>
+          </div>
+          <div id="setup-banner" class="setup-banner">
+            <span class="setup-icon"
+              ><svg><use href="#i-key" /></svg
+            ></span>
+            <div>
+              <strong>Let’s connect your Lighter account</strong>
+              <p>
+                Add your API credentials to see your balance and prepare for
+                trading.
+              </p>
+            </div>
+            <a href="#credentials" class="button text-button"
+              >Connect account<svg><use href="#i-arrow" /></svg
+            ></a>
+          </div>
+          <div id="execution-alert" class="alert warning" hidden></div>
+          <div class="stats-grid">
+            <article class="stat-card">
+              <div class="stat-top">
+                Available balance<svg><use href="#i-wallet" /></svg>
+              </div>
+              <div class="stat-value" id="balance-value">
+                —<small>USDC</small>
+              </div>
+              <div class="stat-foot" id="balance-note">
+                Verify your account to view
+              </div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top">
+                Realized P&amp;L today<span class="mini-tag">UTC</span>
+              </div>
+              <div class="stat-value" id="pnl-value">—</div>
+              <div class="stat-foot" id="pnl-note">
+                Confirmed trades after fees
+              </div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top">
+                BTC / USD<span class="bitcoin-mini">₿</span>
+              </div>
+              <div class="stat-value" id="price-value">—</div>
+              <div class="stat-foot" id="price-note">
+                <span class="status-dot muted"></span>Connecting to market data
+              </div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top">
+                Bot status<span class="status-dot muted" id="bot-dot"></span>
+              </div>
+              <div class="stat-value status-value" id="bot-value">Stopped</div>
+              <div class="stat-foot" id="bot-note">
+                Waiting for your next move
+              </div>
+            </article>
+          </div>
+          <div class="main-grid">
+            <article class="panel chart-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Market overview</h2>
+                  <p id="chart-caption">Live BTC prices from Lighter</p>
+                </div>
+                <div class="segmented" aria-label="Chart">
+                  <button class="selected" data-chart="price">BTC price</button
+                  ><button data-chart="pnl">Realized P&amp;L</button>
+                </div>
+              </div>
+              <div class="chart-summary">
+                <strong id="chart-value">—</strong
+                ><span id="chart-change" class="muted-text"
+                  >Awaiting market data</span
+                >
+              </div>
+              <div class="chart-wrap">
+                <canvas
+                  id="market-chart"
+                  aria-label="BTC price or confirmed realized profit chart"
+                  role="img"
+                ></canvas>
+                <div id="chart-empty" class="chart-empty">
+                  <span class="empty-icon"
+                    ><svg><use href="#i-history" /></svg></span
+                  ><strong>Waiting for the first tick</strong>
+                  <p>Real market data will appear here as it arrives.</p>
+                </div>
+                <div id="chart-tooltip" class="chart-tooltip" hidden></div>
+              </div>
+              <div class="chart-footer">
+                <span
+                  ><span class="status-dot" id="chart-dot"></span
+                  ><span id="chart-live-label">Live public feed</span></span
+                ><span id="chart-range"
+                  >Prices collected during this dashboard session</span
+                >
+              </div>
+            </article>
+            <article class="panel position-panel">
+              <div class="panel-heading">
+                <h2>Current position</h2>
+                <span class="pill neutral" id="position-pill">No position</span>
+              </div>
+              <div class="position-main">
+                <span class="position-symbol">₿</span>
+                <div>
+                  <strong id="position-side">No confirmed exposure</strong
+                  ><span id="position-subtitle"
+                    >Start the bot to reconcile your account</span
+                  >
+                </div>
+              </div>
+              <dl class="data-list">
+                <div>
+                  <dt>Size</dt>
+                  <dd id="position-size">—</dd>
+                </div>
+                <div>
+                  <dt>Average entry</dt>
+                  <dd id="position-entry">—</dd>
+                </div>
+                <div>
+                  <dt>Executable close</dt>
+                  <dd id="position-close">—</dd>
+                </div>
+                <div>
+                  <dt>Expected net P&amp;L</dt>
+                  <dd id="position-pnl">—</dd>
+                </div>
+                <div>
+                  <dt>Leverage</dt>
+                  <dd id="position-leverage">—</dd>
+                </div>
+              </dl>
+              <div class="position-info" id="position-info">
+                <svg><use href="#i-shield" /></svg>
+                <p>One position at a time.<br />Every close is reduce-only.</p>
+              </div>
+              <button class="button danger-quiet full" id="flatten-bot">
+                Close BTC exposure
+              </button>
+            </article>
+          </div>
+          <div class="health-strip">
+            <div>
+              <span class="status-dot muted" id="health-public-dot"></span
+              >Market stream<strong id="health-public">Connecting</strong>
+            </div>
+            <div>
+              <span class="status-dot muted" id="health-private-dot"></span
+              >Account stream<strong id="health-private">Not connected</strong>
+            </div>
+            <div>
+              <svg><use href="#i-refresh" /></svg>Heartbeat<strong
+                id="health-heartbeat"
+                >—</strong
+              >
+            </div>
+            <div>
+              <svg><use href="#i-shield" /></svg>Execution headroom<strong
+                id="health-rate"
+                >—</strong
+              >
+            </div>
+          </div>
+          <article class="panel trades-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>
+                  Recent trades<span class="count-tag" id="trade-count">0</span>
+                </h2>
+                <p>
+                  Actual fills and confirmed outcomes. All timestamps shown in
+                  your desktop’s timezone.
+                </p>
+              </div>
+              <a href="#activity" class="subtle-link"
+                >View activity<svg><use href="#i-arrow" /></svg
+              ></a>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Closed</th>
+                    <th>Side / size</th>
+                    <th>Entry → exit</th>
+                    <th>Net P&amp;L</th>
+                    <th>Duration</th>
+                    <th>Exit reason</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-trades"></tbody>
+              </table>
+            </div>
+            <div class="table-empty" id="trades-empty">
+              <span class="empty-icon"
+                ><svg><use href="#i-history" /></svg></span
+              ><strong>Your first trade starts the story</strong>
+              <p>
+                Completed trades will appear here with their actual fills and
+                fees.
+              </p>
+            </div>
+          </article>
+          <footer class="page-footer">
+            <span
+              ><svg><use href="#i-shield" /></svg>Credentials stay on this
+              machine</span
+            ><span>Live execution can use real funds</span>
+          </footer>
+        </section>
+        <section id="view-credentials" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">ACCOUNT SETUP</div>
+              <h1>Your connection to Lighter.</h1>
+              <p>Keep your trading credentials protected on this machine.</p>
+            </div>
+            <span class="pill neutral" id="account-badge">Not verified</span>
+          </div>
+          <div class="settings-grid">
+            <article class="panel form-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>API credentials</h2>
+                  <p>
+                    Use a dedicated Lighter account and registered trading API
+                    key.
+                  </p>
+                </div>
+                <svg class="accent-icon"><use href="#i-key" /></svg>
+              </div>
+              <form id="credentials-form" autocomplete="off">
+                <div class="form-grid">
+                  <label
+                    >Account index<input
+                      name="LIGHTER_ACCOUNT_INDEX"
+                      inputmode="numeric"
+                      placeholder="Your numeric account index"
+                      autocomplete="off"
+                    /><span
+                      >The index assigned to your Lighter account.</span
+                    ></label
+                  ><label
+                    >API key index<input
+                      name="LIGHTER_API_KEY_INDEX"
+                      inputmode="numeric"
+                      placeholder="Registered slot, 3–254"
+                      autocomplete="off"
+                    /><span
+                      >The slot used when you registered this key.</span
+                    ></label
+                  >
+                </div>
+                <label
+                  >API signing private key
+                  <div class="password-field">
+                    <input
+                      type="password"
+                      name="LIGHTER_API_PRIVATE_KEY"
+                      autocomplete="new-password"
+                      spellcheck="false"
+                      placeholder="80 hexadecimal characters"
+                    /><button
+                      type="button"
+                      id="toggle-key"
+                      aria-label="Show entered API signing key"
+                    >
+                      <svg><use href="#i-eye" /></svg>
+                    </button>
+                  </div>
+                  <span id="key-note"
+                    >Enter a Lighter API signing key. Wallet keys and seed
+                    phrases are not used.</span
+                  ></label
+                >
+                <div class="form-actions">
+                  <button class="button secondary" type="submit">
+                    Save credentials</button
+                  ><button
+                    class="button primary"
+                    type="button"
+                    id="verify-account"
+                  >
+                    <svg><use href="#i-check" /></svg>Save &amp; verify account
+                  </button>
+                </div>
+              </form>
+              <div class="inline-note">
+                <svg><use href="#i-shield" /></svg>
+                <p>
+                  The saved key is never returned to your browser. Leave the key
+                  field blank to keep your existing key.
+                </p>
+              </div>
+            </article>
+            <aside class="panel guide-panel">
+              <span class="eyebrow">GETTING CONNECTED</span>
+              <h2>Three fields. One secure connection.</h2>
+              <ol class="steps">
+                <li>
+                  <span>1</span>
+                  <div>
+                    <strong>Create a trading API key</strong>
+                    <p>
+                      Register a dedicated key using Lighter’s supported API key
+                      setup.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <span>2</span>
+                  <div>
+                    <strong>Save your account details</strong>
+                    <p>
+                      Enter your account index, key slot, and API signing key
+                      here.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <span>3</span>
+                  <div>
+                    <strong>Verify, then configure</strong>
+                    <p>
+                      Verification reads your balance and fee tier. It does not
+                      submit orders.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+              <a
+                href="https://apidocs.lighter.xyz/docs/api-keys"
+                target="_blank"
+                rel="noreferrer noopener"
+                class="subtle-link"
+                >Open official API key documentation<svg>
+                  <use href="#i-arrow" /></svg
+              ></a>
+            </aside>
+          </div>
+          <article class="panel verification-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Account verification</h2>
+                <p id="verification-note">
+                  Your verified account details will appear here.
+                </p>
+              </div>
+              <span class="pill neutral" id="verification-pill">Waiting</span>
+            </div>
+            <div class="verification-grid">
+              <div>
+                <span>Available balance</span
+                ><strong id="verified-balance">—</strong>
+              </div>
+              <div>
+                <span>Account tier</span><strong id="verified-tier">—</strong>
+              </div>
+              <div>
+                <span>Taker fee tick</span><strong id="verified-fee">—</strong>
+              </div>
+              <div>
+                <span>BTC exposure</span
+                ><strong id="verified-position">—</strong>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="button secondary" id="apply-account" disabled>
+                Use verified fee &amp; tier limits</button
+              ><a href="#strategy" class="button text-button"
+                >Configure strategy<svg><use href="#i-arrow" /></svg
+              ></a>
+            </div>
+          </article>
+        </section>
+        <section id="view-strategy" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">TRADING PARAMETERS</div>
+              <h1>Set the rules. Keep control.</h1>
+              <p>
+                Changes apply to the next start. Stop the bot before editing.
+              </p>
+            </div>
+            <button class="button secondary" id="validate-settings">
+              <svg><use href="#i-check" /></svg>Validate configuration
+            </button>
+          </div>
+          <div id="settings-locked" class="alert warning" hidden>
+            The bot is active. Stop it before changing credentials or trading
+            settings.
+          </div>
+          <form id="strategy-form">
+            <div class="strategy-grid">
+              <article class="panel form-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Position sizing</h2>
+                    <p>Choose the capital committed to each position.</p>
+                  </div>
+                  <span class="section-number">01</span>
+                </div>
+                <label
+                  >Sizing mode<select name="POSITION_MODE">
+                    <option value="fixed_margin">Fixed margin per trade</option>
+                    <option value="fixed_notional">
+                      Fixed position notional
+                    </option>
+                  </select></label
+                >
+                <div class="form-grid">
+                  <label
+                    >Leverage<select name="LEVERAGE">
+                      <option value="">Select leverage</option>
+                      <option value="1">1×</option>
+                      <option value="2">2×</option>
+                      <option value="4">4×</option>
+                      <option value="5">5×</option>
+                      <option value="8">8×</option>
+                      <option value="10">10×</option>
+                      <option value="16">16×</option>
+                      <option value="20">20×</option>
+                      <option value="25">25×</option>
+                      <option value="40">40×</option>
+                      <option value="50">50×</option>
+                    </select></label
+                  ><label id="margin-field"
+                    >Margin per trade · USD<input
+                      name="MARGIN_PER_TRADE_USD"
+                      type="number"
+                      min="0.01"
+                      step="0.01" /></label
+                  ><label id="notional-field" hidden
+                    >Position notional · USD<input
+                      name="FIXED_NOTIONAL_USD"
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                  /></label>
+                </div>
+                <div class="sizing-note">
+                  <span>Planned position notional</span
+                  ><strong id="planned-notional">Select leverage</strong>
+                </div>
+              </article>
+              <article class="panel form-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Entry conditions</h2>
+                    <p>Trade only when the signal and market agree.</p>
+                  </div>
+                  <span class="section-number">02</span>
+                </div>
+                <div class="form-grid">
+                  <label
+                    >Minimum signal score<input
+                      name="ENTRY_SCORE_THRESHOLD"
+                      type="number"
+                      min="0.01"
+                      max="1"
+                      step="0.01" /></label
+                  ><label
+                    >Maximum spread · bps<input
+                      name="MAX_SPREAD_BPS"
+                      type="number"
+                      min="0.01"
+                      step="0.1" /></label
+                  ><label
+                    >Entry slippage cap · bps<input
+                      name="MAX_ENTRY_SLIPPAGE_BPS"
+                      type="number"
+                      min="0.01"
+                      step="0.1" /></label
+                  ><label
+                    >Maximum entries / minute<input
+                      name="MAX_ENTRIES_PER_MINUTE"
+                      type="number"
+                      min="1"
+                      step="1"
+                  /></label>
+                </div>
+                <p class="field-note">
+                  Entries also require fresh streams, full-size liquidity,
+                  sufficient margin, and rate headroom.
+                </p>
+              </article>
+              <article class="panel form-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Exit &amp; loss limits</h2>
+                    <p>Positive net estimates trigger a reduce-only close.</p>
+                  </div>
+                  <span class="section-number">03</span>
+                </div>
+                <div class="form-grid">
+                  <label
+                    >Minimum net profit · USD<input
+                      name="MIN_PROFIT_USD"
+                      type="number"
+                      min="0.001"
+                      step="0.01" /></label
+                  ><label
+                    >Maximum loss · USD<input
+                      name="MAX_LOSS_USD"
+                      type="number"
+                      min="0.01"
+                      step="0.1" /></label
+                  ><label
+                    >Maximum holding time · ms<input
+                      name="MAX_HOLD_MS"
+                      type="number"
+                      min="1"
+                      step="100" /></label
+                  ><label
+                    >Adverse move limit · bps<input
+                      name="MAX_ADVERSE_MOVE_BPS"
+                      type="number"
+                      min="0.01"
+                      step="0.1" /></label
+                  ><label
+                    >Normal exit slippage · bps<input
+                      name="MAX_NORMAL_EXIT_SLIPPAGE_BPS"
+                      type="number"
+                      min="0.01"
+                      step="0.1" /></label
+                  ><label
+                    >Emergency exit slippage · bps<input
+                      name="MAX_EMERGENCY_EXIT_SLIPPAGE_BPS"
+                      type="number"
+                      min="0.01"
+                      step="0.1"
+                  /></label>
+                </div>
+              </article>
+              <article class="panel form-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Fees &amp; account limits</h2>
+                    <p>Use your verified account tier and fee values.</p>
+                  </div>
+                  <span class="section-number">04</span>
+                </div>
+                <div class="form-grid">
+                  <label
+                    >Expected taker fee tick<input
+                      name="EXPECTED_TAKER_FEE_TICK"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="From account verification" /></label
+                  ><label
+                    >IMF representation<select name="ACCOUNT_IMF_SCALE">
+                      <option value="1">Fraction · scale 1</option>
+                      <option value="100">Percent · scale 100</option>
+                      <option value="10000">Native ticks · scale 10000</option>
+                    </select></label
+                  ><label
+                    >Transactions / minute<input
+                      name="TX_PER_MINUTE"
+                      type="number"
+                      min="5"
+                      step="1"
+                      placeholder="Based on your tier" /></label
+                  ><label
+                    >Read budget / minute<input
+                      name="HTTP_READS_PER_MINUTE"
+                      type="number"
+                      min="10"
+                      step="1"
+                      placeholder="Based on your tier" /></label
+                  ><label
+                    >Exit transaction reserve<input
+                      name="EXIT_TX_RESERVE"
+                      type="number"
+                      min="1"
+                      step="1" /></label
+                  ><label
+                    >Available volume quota<input
+                      name="INITIAL_VOLUME_QUOTA"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="Plus / Premium, if required"
+                  /></label>
+                </div>
+                <p class="field-note">
+                  Standard shares 60 requests/minute. Plus / Premium reads use
+                  weighted units. Confirm account IMF units before starting.
+                </p>
+              </article>
+            </div>
+            <article class="panel advanced-panel">
+              <details>
+                <summary>
+                  <span>Advanced safeguards &amp; signal weights</span
+                  ><span class="muted-text"
+                    >Timing, buffers, and microstructure settings</span
+                  >
+                </summary>
+                <div class="form-grid advanced-grid" id="advanced-fields"></div>
+              </details>
+            </article>
+            <div class="save-bar">
+              <div>
+                <svg><use href="#i-shield" /></svg>Settings are saved locally.
+                Trading requires a separate confirmation.
+              </div>
+              <button class="button primary" type="submit">
+                Save strategy<svg><use href="#i-check" /></svg>
+              </button>
+            </div>
+          </form>
+        </section>
+        <section id="view-activity" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">EXECUTION JOURNAL</div>
+              <h1>Every action, in view.</h1>
+              <p>Inspect the bot’s output and its durable trade records.</p>
+            </div>
+            <span class="pill neutral">Local journal</span>
+          </div>
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Execution activity</h2>
+                <p>
+                  Bot output and saved activity logs. Saved API keys are
+                  redacted.
+                </p>
+              </div>
+              <button class="button secondary small" id="refresh-activity">
+                <svg><use href="#i-refresh" /></svg>Refresh
+              </button>
+            </div>
+            <div id="activity-log" class="activity-log">
+              <div class="log-empty">
+                No bot activity yet. Account verification and market viewing do
+                not start trading.
+              </div>
+            </div>
+          </article>
+          <article class="panel all-trades-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Trade journal</h2>
+                <p>
+                  Latest 100 records. Recovered or incomplete accounting is
+                  labeled.
+                </p>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Closed</th>
+                    <th>Side / size</th>
+                    <th>Entry → exit</th>
+                    <th>Net P&amp;L</th>
+                    <th>Duration</th>
+                    <th>Exit reason</th>
+                  </tr>
+                </thead>
+                <tbody id="all-trades"></tbody>
+              </table>
+            </div>
+            <div class="table-empty" id="all-trades-empty">
+              <strong>No completed trades</strong>
+              <p>Records appear here only after real execution.</p>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+    <div id="toast" class="toast" role="status" hidden>
+      <svg><use href="#i-check" /></svg><span></span>
+    </div>
+    <dialog id="confirm-dialog">
+      <div class="dialog-icon">
+        <svg><use href="#i-alert" /></svg>
+      </div>
+      <h2 id="confirm-title">Start live trading?</h2>
+      <p id="confirm-description"></p>
+      <div class="confirm-details" id="confirm-details"></div>
+      <label id="confirmation-label"
+        >Type <strong id="confirmation-word">START LIVE</strong> to
+        confirm<input
+          id="confirmation-input"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="START LIVE"
+      /></label>
+      <div class="dialog-actions">
+        <button class="button secondary" id="cancel-confirm">Cancel</button
+        ><button class="button primary" id="accept-confirm" disabled>
+          Start live trading
+        </button>
+      </div>
+    </dialog>
+  </body>
+</html>

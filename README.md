@@ -21,7 +21,9 @@ lightercodex/
 │   ├── rate_limits.py          # sliding windows and exit reserves
 │   ├── persistence.py          # durable intents, fills, SQLite, process lock
 │   ├── metrics.py              # bounded latency samples and trade accounting
-│   └── logging_setup.py        # queued, rotating UTC logs
+│   ├── logging_setup.py        # queued, rotating UTC logs
+│   ├── dashboard.py            # local browser UI and guarded process controls
+│   └── web/                    # packaged HTML, CSS, and JavaScript
 ├── tests/                     # math, transport, lifecycle, recovery, limits
 ├── deploy/                    # install.sh, update.sh, systemd unit
 ├── docs/                      # verified API contracts and validation record
@@ -132,6 +134,70 @@ Expected GREEN is an estimate at decision time. Fills can occur later at changed
 
 ## Linux deployment
 
+### Browser dashboard for RustDesk
+
+The dashboard provides Overview, Connection, Strategy, and Activity pages. It includes a real public BTC price stream, a chart of prices received during the dashboard session, available balance from account verification or the latest bot snapshot, confirmed trade history/P&L, position snapshots with freshness labels, local logs, and Start/Stop/Close BTC controls. An empty account or journal displays an empty state; no demo prices, trades, or profit figures are generated.
+
+RustDesk controls another machine's desktop. Open **http://127.0.0.1:8787 in the browser on the VPS desktop you access through RustDesk**. This requires a graphical desktop and browser on that VPS; installing this application does not install RustDesk or a desktop environment. A shell-only VPS has no browser desktop to control. No inbound web firewall port is needed: the server listens only on loopback.
+
+For an existing installation, run from the root VPS shell:
+
+```bash
+systemctl stop lighter-scalper
+# Confirm BTC exposure is closed on Lighter before switching controllers.
+cd /opt/lighter-scalper
+git pull --ff-only
+bash deploy/install-dashboard.sh
+```
+
+For a fresh VPS:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git
+git clone https://github.com/0xSkyler/lightercodex.git
+cd lightercodex
+sudo bash deploy/install-dashboard.sh
+```
+
+The dashboard installer installs the application if needed, refuses an active legacy bot, disables the legacy bot service, and enables/starts `lighter-dashboard.service`. It reuses `/var/lib/lighter-scalper` and `/var/log/lighter-scalper`, preserving the execution journal. Existing `/etc/lighter-scalper.env` is copied to `/var/lib/lighter-scalper/dashboard.env` only on the first dashboard installation. The dashboard's editable settings thereafter live in **`/var/lib/lighter-scalper/dashboard.env`**, owned by the unprivileged service user with mode 600. Editing `/etc/lighter-scalper.env` does not change dashboard settings.
+
+In the browser:
+
+1. Open **Connection**, enter your three Lighter credential fields, and choose **Save & verify account**. Verification does not submit orders.
+2. Choose **Use verified fee & tier limits** to fill the actual fee and conservative limits for a recognized tier. Review these settings, leverage, position size, loss limits, and IMF representation in **Strategy**. Supply a verified volume quota if Plus/Premium needs it. Save and validate.
+3. Return to **Overview**, choose **Start trading**, and type `START LIVE` to authorize real-money execution. Verification expires after 15 minutes; recheck the account if prompted. The dashboard passes live gates only to that child process and does not save live consent in settings.
+4. **Stop bot** sends SIGTERM and waits for the engine's reconciliation and protective flatten. **Close BTC exposure** requires typing `FLATTEN BTC`; it stops the controlled bot and invokes the existing explicit flatten workflow with the same account and journal. If a close is unconfirmed, inspect Lighter immediately.
+
+Credentials are written atomically to a mode-600 file and never returned by the HTTP API. The browser does not save them to local/session storage. Saved keys and long hexadecimal payloads are redacted from activity output. This is filesystem protection, not encryption at rest. The HTTP boundary enforces loopback/Host checks, same-origin requests, a per-process session token, a content security policy, and bounded request size. There is no public HTTP login or remote-bind option. An unrelated bot with the same journal blocks dashboard mutations; only one account controller may run across machines.
+
+The dashboard starts after reboot; **the trading bot does not automatically restart or resume trading**. Closing the browser leaves the dashboard and an already-started bot running. Stopping/restarting the dashboard service stops its controlled bot and attempts protective reconciliation. Do not start the legacy `lighter-scalper.service` while using the UI. If you switch back to the legacy service, stop/disable the dashboard first and deliberately update the legacy environment file from your chosen settings.
+
+```bash
+sudo systemctl status lighter-dashboard
+sudo journalctl -u lighter-dashboard -f
+sudo systemctl restart lighter-dashboard
+sudo /opt/lighter-scalper/deploy/update.sh
+```
+
+The update script detects dashboard deployment and updates/restarts the dashboard while leaving trading stopped. It preserves settings and the journal. Activity shows output from controlled processes, or a bounded tail of saved application logs after restart. Durable bot logs are also under `/var/log/lighter-scalper`.
+
+If RustDesk controls your own computer rather than a desktop on the VPS, open an SSH tunnel on that computer:
+
+```bash
+ssh -N -L 8787:127.0.0.1:8787 root@YOUR_VPS_IP
+```
+
+Keep the SSH connection open and visit `http://127.0.0.1:8787` in that computer's browser. Do not expose port 8787 publicly.
+
+For local development, no credentials are needed to open the UI and view public prices:
+
+```bash
+.venv/bin/lighter-scalper --env .env ui
+```
+
+### CLI service deployment
+
 Target Ubuntu 24.04 with Python 3.12, systemd, synchronized time, and a trading-permitted network region. The cloud workspace is a development environment; it is not a persistent trading VPS.
 
 Commit and push the generated source and lockfiles to GitHub before using the GitHub installation workflow. The onboarding task creates local files; it does not publish a GitHub branch.
@@ -145,7 +211,7 @@ chronyc tracking
 timedatectl show --property=NTPSynchronized --value
 ```
 
-The installer creates a dedicated user, a checkout at `/opt/lighter-scalper`, a virtual environment with hash-verified dependencies, state/log directories, and an enabled systemd unit. It preserves an existing environment file and does not start trading. The installation checkout must contain a commit. Run updates through the installed checkout's update script. No Docker, Redis, GPU, browser, or GUI is needed.
+The installer creates a dedicated user, a checkout at `/opt/lighter-scalper`, a virtual environment with hash-verified dependencies, state/log directories, and an enabled systemd unit. It preserves an existing environment file and does not start trading. The installation checkout must contain a commit. Run updates through the installed checkout's update script. The CLI service needs no Docker, Redis, GPU, browser, or desktop.
 
 After account inspection and configuration validation, explicitly set both confirmations in the protected environment file:
 
