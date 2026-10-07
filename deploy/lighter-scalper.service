@@ -1,0 +1,38 @@
+[Unit]
+Description=Lighter live mainnet BTC perpetual scalper
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=lighter-scalper
+Group=lighter-scalper
+WorkingDirectory=/opt/lighter-scalper
+EnvironmentFile=/etc/lighter-scalper.env
+Environment=DATA_DIR=/var/lib/lighter-scalper
+Environment=LOG_DIR=/var/log/lighter-scalper
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/lighter-scalper/.venv/bin/lighter-scalper --env /dev/null run
+Restart=always
+RestartSec=15
+RestartPreventExitStatus=78
+TimeoutStopSec=180
+KillSignal=SIGTERM
+StateDirectory=lighter-scalper
+StateDirectoryMode=0700
+LogsDirectory=lighter-scalper
+LogsDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/lighter-scalper /var/log/lighter-scalper
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LimitNOFILE=4096
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

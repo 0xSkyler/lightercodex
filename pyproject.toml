@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lighter-btc-scalper"
+version = "0.1.0"
+description = "Event-driven, live mainnet BTC perpetual scalper for Lighter"
+requires-python = ">=3.12"
+dependencies = ["lighter-sdk==1.1.6", "aiohttp>=3.12,<4", "python-dotenv>=1.1,<2"]
+
+[project.scripts]
+lighter-scalper = "scalper.main:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "pytest-asyncio>=1,<2", "ruff>=0.14,<1", "mypy>=1.18,<2"]
+build = ["setuptools==80.9.0", "wheel==0.45.1"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+disallow_incomplete_defs = true
+ignore_missing_imports = true
