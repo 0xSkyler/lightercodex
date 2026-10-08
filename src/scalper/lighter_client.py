@@ -337,14 +337,7 @@ class LighterClient:
 
     async def verify_leverage(self, snapshot: Snapshot, *, configure: bool) -> None:
         row = snapshot.position_row
-        # The account JSON example uses fractional IMF. Explicit scale permits percentage
-        # or native tick representations without inferring units from requested leverage.
-        expected = self.config.account_imf_scale / self.config.leverage
-        if (
-            row is not None
-            and D(str(row["initial_margin_fraction"])) == expected
-            and int(row["margin_mode"]) == self.config.margin_mode
-        ):
+        if self._leverage_matches(row):
             return
         if (
             not configure
@@ -369,18 +362,27 @@ class LighterClient:
                 raise ExchangeError("ORDER_SIGNING_FAILED")
             self.nonce += 1
             await self._send(int(tx_type), info, {}, "leverage")
-        deadline = time.monotonic_ns() + self.config.order_timeout_ms * 1_000_000
+        # Leverage is an account configuration transaction rather than an IOC order. Its
+        # authoritative account state can settle later than an order acknowledgement.
+        deadline = time.monotonic_ns() + max(self.config.order_timeout_ms, 15_000) * 1_000_000
         while time.monotonic_ns() < deadline:
-            await asyncio.sleep(0.15)
+            await asyncio.sleep(0.5)
             confirmed = await self.snapshot()
-            row = confirmed.position_row
-            if (
-                row
-                and D(str(row["initial_margin_fraction"])) == expected
-                and int(row["margin_mode"]) == self.config.margin_mode
-            ):
+            if self._leverage_matches(confirmed.position_row):
                 return
         raise ExchangeError("CONFIG_ERROR: leverage change not confirmed")
+
+    def _leverage_matches(self, row: dict[str, Any] | None) -> bool:
+        if row is None or int(row["margin_mode"]) != self.config.margin_mode:
+            return False
+        observed = D(str(row["initial_margin_fraction"]))
+        if not observed.is_finite():
+            return False
+        # Lighter account responses have appeared as fractions, percentages, and native
+        # 1/10000 ticks across API representations. Each candidate below encodes exactly
+        # the requested IMF; no tolerance or nearest-leverage inference is used.
+        native = D(10000) / self.config.leverage
+        return observed in (native / 10000, native / 100, native)
 
     async def close(self) -> None:
         if self.signer:

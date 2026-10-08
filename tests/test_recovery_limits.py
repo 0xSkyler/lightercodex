@@ -67,6 +67,26 @@ async def test_tier_fee_change_and_excess_limits_fail_closed(config):
         await client.close()
 
 
+@pytest.mark.parametrize("observed", ["0.04", "4", "400"])
+async def test_leverage_confirmation_accepts_exact_api_unit_representations(config, observed):
+    client = LighterClient(config, Metrics())
+    try:
+        row = {"initial_margin_fraction": observed, "margin_mode": 0}
+        assert client._leverage_matches(row)
+    finally:
+        await client.close()
+
+
+async def test_leverage_confirmation_rejects_other_leverage_or_margin_mode(config):
+    client = LighterClient(config, Metrics())
+    try:
+        assert not client._leverage_matches({"initial_margin_fraction": "0.05", "margin_mode": 0})
+        assert not client._leverage_matches({"initial_margin_fraction": "0.04", "margin_mode": 1})
+        assert not client._leverage_matches(None)
+    finally:
+        await client.close()
+
+
 async def test_bbo_can_trigger_green_only_for_advertised_entire_position(bot):
     bot.machine.transition(State.ENTRY_PENDING)
     bot.machine.transition(State.OPEN_LONG)

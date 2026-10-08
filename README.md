@@ -75,7 +75,7 @@ chmod 600 .env
 
 `account-info` requires only the three credentials. It reads the registered account's tier, fees, balance, and BTC position/IMF without configuring leverage or submitting a transaction. Use `current_taker_fee_tick` to set `EXPECTED_TAKER_FEE_TICK`. The official fee tick denominator is 1,000,000, so a tick value of 280 means a rate of 0.000280, or 2.8 bps. A missing fee field on a trade is documented as zero.
 
-Account-position IMF examples use a fractional value. `ACCOUNT_IMF_SCALE=1` means IMF × leverage must equal 1; if the actual account endpoint represents IMF in percent, explicitly use 100, or 10000 for native ticks. Inspect the returned value and verify the convention before live start. The native signed update always uses integer `10000 / LEVERAGE`; leverage must be exactly representable and within current BTC market constraints. Version 1 supports cross margin (`MARGIN_MODE=0`).
+Account-position IMF has appeared as a fraction, percentage, or native 1/10000 ticks across API representations. Confirmation accepts only an exact match to the requested leverage in one of those three representations; it never uses tolerance or nearest-leverage inference. `ACCOUNT_IMF_SCALE` remains restricted to 1, 100, or 10000 for configuration compatibility. The native signed update always uses integer `10000 / LEVERAGE`; leverage must be exactly representable and within current BTC market constraints. Version 1 supports cross margin (`MARGIN_MODE=0`).
 
 `LIGHTER_API_PRIVATE_KEY` must be an actual local signing key. A network-proxy placeholder cannot be used by the native signer. Supply it through a protected environment file or a suitable secure process-environment binding.
 

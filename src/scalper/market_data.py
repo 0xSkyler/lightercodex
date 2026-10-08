@@ -15,6 +15,7 @@ from yarl import URL
 
 from scalper.config import WS_URL
 from scalper.lighter_client import ExchangeError, LighterClient
+from scalper.orderbook import BookError
 
 log = logging.getLogger("scalper")
 
@@ -175,9 +176,10 @@ class Streams:
                 raise
             except Exception as error:
                 self.client.metrics.counts[f"{name}_reconnects"] += 1
-                log.warning(
-                    "%s_STREAM_DISCONNECTED category=%s", name.upper(), type(error).__name__
-                )
+                category = type(error).__name__
+                if isinstance(error, BookError):
+                    category += ":" + str(error).replace("\n", " ")[:120]
+                log.warning("%s_STREAM_DISCONNECTED category=%s", name.upper(), category)
             finally:
                 self.connections.pop(name, None)
                 if name == "public":
