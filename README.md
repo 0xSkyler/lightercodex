@@ -274,7 +274,7 @@ The flatten command cancels conflicting BTC orders only as part of the explicitl
 * `CONFIG_ERROR`: inspect `.env` file permissions and required fields; process variables override the file. Empty live gates deliberately prevent execution.
 * `AUTH_ERROR`: verify the account/key slot and registered Lighter API signing key using `account-info`. Wallet keys are a different format.
 * Public data succeeds but private WebSocket fails: confirm trading is permitted from the VPS region. Read-only public access does not prove trading access.
-* Book nonce gap, disconnect, or stale data: entries stop; exposure goes through authoritative recovery. A fresh snapshot resets the book; offsets may jump across servers.
+* Book nonce gap or disconnect: entries stop and exposure goes through authoritative recovery. A delayed subscription snapshot is retained only to consume its ordered backlog; the book remains invalid and entries stay disabled until a server-timestamped update is within `MARKET_DATA_STALE_MS`. A fresh snapshot resets the book, and offsets may jump across servers.
 * `UNRESOLVED_ORDER_INTENT`: signed hash and client ID are in SQLite. Inspect the corresponding transaction and order on Lighter. Missing lookup results alone do not establish failure; do not submit the entry again.
 * `UNKNOWN_BTC_ORDER`: another client used the dedicated account, or state was replaced. Automatic cancellation is blocked. Inspect the order and use the explicit flatten command if appropriate.
 * `RATE_LIMIT_ERROR`: reduce frequency and account for shared L1 usage. Standard reads and transactions share a bucket; Plus/Premium endpoint weights matter.

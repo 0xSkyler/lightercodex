@@ -90,6 +90,7 @@ class OrderBook:
         self.offset: int | None = None
         self.nonce: int | None = None
         self.received_ns = 0
+        self.initialized = False
         self.valid = False
 
     def update(self, payload: dict[str, Any], now_ns: int, *, snapshot: bool = False) -> bool:
@@ -97,8 +98,9 @@ class OrderBook:
             self.bids.clear()
             self.asks.clear()
             self.offset = self.nonce = None
+            self.initialized = False
             self.valid = False
-        elif not self.valid:
+        elif not self.initialized:
             raise BookError("Delta before snapshot")
         offset = payload.get("offset")
         if offset is None:
@@ -130,6 +132,7 @@ class OrderBook:
         self.offset = offset
         self.nonce = int(payload["nonce"]) if "nonce" in payload else None
         self.received_ns = now_ns
+        self.initialized = True
         self.valid = True
         return True
 

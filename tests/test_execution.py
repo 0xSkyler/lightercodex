@@ -7,7 +7,6 @@ import pytest
 from scalper.config import D
 from scalper.lighter_client import ExchangeError, LighterClient, Snapshot, parse_position
 from scalper.metrics import Metrics, TradeCycle
-from scalper.orderbook import BookError
 from scalper.pnl import Position
 from scalper.signals import Signal
 from scalper.state_machine import State
@@ -158,12 +157,36 @@ async def test_account_other_market_update_does_not_erase_btc(bot):
     assert bot.position.quantity == 1
 
 
-async def test_delayed_server_data_is_rejected(bot):
-    with pytest.raises(BookError, match="Delayed"):
-        bot.on_public(
-            {"type": "update/order_book", "timestamp": time.time_ns() // 1_000_000 - 10000}
-        )
+async def test_delayed_server_data_catches_up_without_enabling_entries(bot):
+    now_ms = time.time_ns() // 1_000_000
+    bot.on_public(
+        {
+            "type": "subscribed/order_book",
+            "timestamp": now_ms - 10000,
+            "order_book": {
+                "offset": 1,
+                "bids": [{"price": "100", "size": "1"}],
+                "asks": [{"price": "101", "size": "1"}],
+            },
+        }
+    )
+    assert bot.book.initialized and not bot.book.valid
+    bot.on_public(
+        {
+            "type": "update/order_book",
+            "timestamp": now_ms - 9000,
+            "order_book": {"offset": 2, "bids": [], "asks": []},
+        }
+    )
     assert not bot.book.valid
+    bot.on_public(
+        {
+            "type": "update/order_book",
+            "timestamp": time.time_ns() // 1_000_000,
+            "order_book": {"offset": 3, "bids": [], "asks": []},
+        }
+    )
+    assert bot.book.valid and not bot.book_time_stale
 
 
 async def test_fill_deduplication_and_actual_fee_accounting(bot):

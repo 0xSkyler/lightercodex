@@ -72,6 +72,7 @@ class Bot:
         self.last_account_transaction = 0
         self.last_position_row: dict[str, Any] | None = None
         self.halted_reason = ""
+        self.book_time_stale = False
         self.background: list[asyncio.Task[None]] = []
         self.exit_reason: str | None = None
         self.client.on_signed = journal.annotate
@@ -95,16 +96,29 @@ class Bot:
         now = time.monotonic_ns()
         kind = message["type"]
         if kind.endswith("/order_book"):
+            time_fresh = True
+            lag_ms: int | None = None
             if message.get("timestamp"):
                 server_ms = int(message["timestamp"])
                 lag_ms = time.time_ns() // 1_000_000 - server_ms
-                if lag_ms > self.config.market_stale_ms or lag_ms < -5000:
-                    self.book.valid = False
-                    raise BookError("Delayed book event or unsynchronized clock")
+                time_fresh = -5000 <= lag_ms <= self.config.market_stale_ms
             if self.book.update(
                 message["order_book"], now, snapshot=kind.startswith("subscribed/")
             ):
-                self.signals.quote(self.book, now)
+                if time_fresh:
+                    if self.book_time_stale:
+                        log.info("PUBLIC_BOOK_FRESH lag_ms=%d", lag_ms)
+                    self.book_time_stale = False
+                    self.signals.quote(self.book, now)
+                else:
+                    self.book.valid = False
+                    if not self.book_time_stale:
+                        log.warning(
+                            "PUBLIC_BOOK_STALE lag_ms=%d limit_ms=%d; entries disabled while catching up",
+                            lag_ms,
+                            self.config.market_stale_ms,
+                        )
+                    self.book_time_stale = True
         elif kind == "update/trade":
             trades = message.get("trades", [])
             if not isinstance(trades, list):
